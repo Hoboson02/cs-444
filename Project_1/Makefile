@@ -1,2 +1,2 @@
 hellothread: hellothread.c
-    gcc -Wall -Wextra -o $@ $< -lpthread
+	gcc -Wall -Wextra -o $@ $< -lpthread
