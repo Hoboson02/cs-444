@@ -19,6 +19,8 @@ int main(void)
 	printf("%s\n", "Launching threads");
 	pthread_create(&t1, NULL, run, "thread 1");
 	pthread_create(&t2, NULL, run, "thread 2");
+	pthread_join(t1, NULL);
+  pthread_join(t2, NULL);
 	printf("%s\n", "Threads complete!");
 
 }
