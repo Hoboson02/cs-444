@@ -16,5 +16,12 @@ void bwrite(int block_num, unsigned char *block) {
 }
 
 int alloc(void) {
-  
+  unsigned char data_block[BLOCK_SIZE];
+  bread(FREE_DATA_BLOCK_NUM, data_block);
+  int low_free_bit = find_free(data_block);
+  if(low_free_bit != -1) {
+    set_free(data_block, low_free_bit, 1);
+  }
+  bwrite(FREE_DATA_BLOCK_NUM ,data_block);
+  return low_free_bit;
 }
