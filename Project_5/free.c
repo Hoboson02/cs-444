@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include "free.h"
+#include "block.h"
 
 int find_low_clear_bit(unsigned char x) {
   for (int i = 0; i < 8; i++)
@@ -9,10 +10,23 @@ int find_low_clear_bit(unsigned char x) {
   return -1;
 }
 
-set_free(unsigned char *block, int num, int set) {
-
+void set_free(unsigned char *block, int num, int set) {
+  int byte_num = num / 8; 
+  int bit_num = num % 8;
+  if(set) {
+    block[byte_num] |= (1 << bit_num);
+  }
+  else {
+    block[byte_num] &= ~(1 << bit_num);
+  }
 }
 
-find_free(unsigned char *block) {
-
+int find_free(unsigned char *block) {
+  for(int i = 0; i < BLOCK_SIZE; i++) {
+    int zero_bit = find_low_clear_bit(block[i]);
+    if (zero_bit != -1) {
+      return (i*8) + zero_bit;
+    }
+  }
+  return -1;
 }
