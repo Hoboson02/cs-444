@@ -1,6 +1,6 @@
 .PHONY: test
 
-simfs.a: image.o block.o 
+simfs.a: image.o block.o free.o
 	ar rcs $@ $^
 
 image.o: image.c image.h
