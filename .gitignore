@@ -5,3 +5,4 @@ Project_5/simfs.a
 Project_5/block.o
 Project_5/image.o
 Project_5/free.o
+Project_5/inode.o
