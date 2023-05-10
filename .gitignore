@@ -6,3 +6,4 @@ Project_5/block.o
 Project_5/image.o
 Project_5/free.o
 Project_5/inode.o
+Project_5/mkfs.o
