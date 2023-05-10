@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include "block.h"
+#include "image.h"
 
 unsigned char *bread(int block_num, unsigned char *block) {
     int offset = block_num * BLOCK_SIZE;
