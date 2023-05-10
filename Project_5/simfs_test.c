@@ -29,7 +29,17 @@ void test_blockb() {
   }
 }
 
+void test_free() {
+  unsigned char block[BLOCK_SIZE];
+  memset(block, 0xFF, BLOCK_SIZE);
+  set_free(block, 0, 0);
+  CTEST_ASSERT(find_free(block) == 0, "testing find_free to 0 and set_free to 0");
+  set_free(block, 0, 1);
+  CTEST_ASSERT(find_free(block) == 0, "testing find_free to 0 and set_free to 1");
+}
+
 int main(void) {
   test_image();
   test_blockb();
+  test_free();
 }
