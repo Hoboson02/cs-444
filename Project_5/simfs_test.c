@@ -9,7 +9,7 @@
 #include "mkfs.h"
 #include "ctest.h"
 
-
+#ifdef CTEST_ENABLE
 void test_image() {
   image_open("test_file.img", 0);
   image_close();
@@ -50,11 +50,20 @@ void test_inode() {
 void test_mkfs() {
   image_open("test_file.img", 0);
   unsigned char block[BLOCK_SIZE];
-  unsigned char outblock[BLOCK_SIZE] = {0};
+  unsigned char block2[BLOCK_SIZE];
+  memset(block, 'h', BLOCK_SIZE);
+  mkfs();
+
+  CTEST_ASSERT(memcmp(bread(BITS_PER_BYTE, block2), block, 4) == 0, "Testing i all blocks are 0");
+  CTEST_ASSERT(alloc() == 7, "Testing if blocks are allocated correctly");
+
   image_close();
 }
 
+#endif
+
 int main(void) {
+  #ifdef CTEST_ENABLE
   CTEST_VERBOSE(1);
 
   test_image();
@@ -65,4 +74,5 @@ int main(void) {
 
   CTEST_RESULTS();
   CTSET_EXIT();
+  #endif
 }

@@ -3,6 +3,6 @@
 
 #define NUM_OF_BLOCKS 1024
 
-void mfks(void);
+void mkfs(void);
 
 #endif
