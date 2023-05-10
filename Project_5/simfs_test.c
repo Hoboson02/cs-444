@@ -47,9 +47,22 @@ void test_inode() {
   image_close();
 }
 
+void test_mkfs() {
+  image_open("test_file.img", 0);
+  unsigned char block[BLOCK_SIZE];
+  unsigned char outblock[BLOCK_SIZE] = {0};
+  image_close();
+}
+
 int main(void) {
+  CTEST_VERBOSE(1);
+
   test_image();
   test_blockb();
   test_free();
   test_inode();
+  test_mkfs();
+
+  CTEST_RESULTS();
+  CTSET_EXIT();
 }
