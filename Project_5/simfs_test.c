@@ -41,7 +41,9 @@ void test_free() {
 void test_inode() {
   image_open("test_file.img", 0);
   CTEST_ASSERT(ialloc() == 0, "Testing first with 0");
+  CTEST_ASSERT(alloc() == 0, "Testing empty block map");
   CTSET_ASSERT(ialloc() == 1, "Testing second with 1");
+  CTEST_ASSERT(alloc() == 0, "Testing non-empty block map");
   image_close();
 }
 
