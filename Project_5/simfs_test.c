@@ -38,8 +38,16 @@ void test_free() {
   CTEST_ASSERT(find_free(block) == 0, "testing find_free to 0 and set_free to 1");
 }
 
+void test_inode() {
+  image_open("test_file.img", 0);
+  CTEST_ASSERT(ialloc() == 0, "Testing first with 0");
+  CTSET_ASSERT(ialloc() == 1, "Testing second with 1");
+  image_close();
+}
+
 int main(void) {
   test_image();
   test_blockb();
   test_free();
+  test_inode();
 }
