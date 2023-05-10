@@ -21,7 +21,7 @@ int alloc(void) {
   int low_free_bit = find_free(data_block);
   if(low_free_bit != -1) {
     set_free(data_block, low_free_bit, 1);
+    bwrite(FREE_DATA_BLOCK_NUM ,data_block);
   }
-  bwrite(FREE_DATA_BLOCK_NUM ,data_block);
   return low_free_bit;
 }

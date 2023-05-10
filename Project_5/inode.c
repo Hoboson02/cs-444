@@ -9,7 +9,7 @@ int ialloc(void) {
   int low_free_bit = find_free(inode_map);
   if(low_free_bit != -1) {
     set_free(inode_map, low_free_bit, 1);
+    bwrite(FREE_INODE_BLOCK_NUM ,inode_map);
   }
-  bwrite(FREE_INODE_BLOCK_NUM ,inode_map);
   return low_free_bit;
 }
