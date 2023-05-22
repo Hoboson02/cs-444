@@ -1,24 +1,20 @@
 #include "inode.h"
 #include "block.h"
 #include "free.h"
+#include "pack.h"
 #include <stdlib.h>
 
-int get_block_num(inode_num) {
+int get_block_num(int inode_num) {
   return inode_num / INODES_PER_BLOCK + INODE_FIRST_BLOCK;
 }
 
-int get_block_offset(inode_num) {
+int get_block_offset(int inode_num) {
   return inode_num % INODES_PER_BLOCK;
 }
 
-int get_block_offset_bytes(block_offset) {
+int get_block_offset_bytes(int block_offset) {
   return block_offset * INODE_SIZE;
 }
-
-int get_flags(block, block_offset_bytes) {
-  return read_u8(block + block_offset_bytes + 7);
-}
-
 static struct inode incore[MAX_SYS_OPEN_FILES] = {0};
 
 // ----------Finding an inode and Reading Data-------------------------------------------------------------------------------------------
@@ -77,11 +73,11 @@ void read_inode(struct inode *in, int inode_num) {
 
   bread(block_num, free_block); // Then you'll read the data from disk into a block
 
-  in->size = read_u32(free_block, block_offset_bytes);
-  in->owner_id = read_u16(free_block, block_offset_bytes + 4);
-  in->permissions = read_u8(free_block, block_offset_bytes + 6);
-  in->flags = read_u8(free_block, block_offset_bytes + 7);
-  in->link_count = read_u8(free_block, block_offset_bytes + 8);
+  in->size = read_u32(free_block + block_offset_bytes);
+  in->owner_id = read_u16(free_block + block_offset_bytes + 4);
+  in->permissions = read_u8(free_block + block_offset_bytes + 6);
+  in->flags = read_u8(free_block + block_offset_bytes + 7);
+  in->link_count = read_u8(free_block + block_offset_bytes + 8);
   for (int i = 0; i < INODE_PTR_COUNT; i++) {
     in->block_ptr[i] = read_u16(free_block + block_offset_bytes + 9 + (i*2));
   }
