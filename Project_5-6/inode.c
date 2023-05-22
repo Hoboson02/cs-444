@@ -90,10 +90,10 @@ void read_inode(struct inode *in, int inode_num) {
   bread(block_num, free_block); // Then you'll read the data from disk into a block
 
   in->size = read_u32(free_block, block_offset_bytes);
-  in->owner_id = read_u16(free_block, block_offset_bytes);
-  in->permissions = read_u8(free_block, block_offset_bytes);
-  in->flags = read_u8(free_block, block_offset_bytes);
-  in->link_count = read_u8(free_block, block_offset_bytes);
+  in->owner_id = read_u16(free_block, block_offset_bytes + 4);
+  in->permissions = read_u8(free_block, block_offset_bytes + 6);
+  in->flags = read_u8(free_block, block_offset_bytes + 7);
+  in->link_count = read_u8(free_block, block_offset_bytes + 8);
   for (int i = 0; i < INODE_PTR_COUNT; i++) {
     in->block_ptr[i] = read_u16(free_block + block_offset_bytes + 9 + (i*2));
   }
