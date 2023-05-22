@@ -11,6 +11,7 @@ int block_offset_bytes = block_offset * INODE_SIZE;
 
 int flags = read_u8(block + block_offset_bytes + 7);
 
+static struct inode incore[MAX_SYS_OPEN_FILES] = {0};
 
 int ialloc(void) {
   unsigned char inode_map[BLOCK_SIZE];
@@ -52,30 +53,13 @@ int ialloc(void) {
 
 
 // ----------In-Core inodes-------------------------------------------------------------------------------------------
+struct inode *find_incore_free(void) {
 
-  // It's pretty inconvenient to be using read_u32() and write_u16() all over the place. We're going to be reading inode data from the disk and storing it in an in-memory struct for easier use.
+}
 
-  // The structure will look like this:
-
-  // // In inode.h
-
-  // #define INODE_PTR_COUNT 16
-
-  // struct inode {
-  //     unsigned int size;
-  //     unsigned short owner_id;
-  //     unsigned char permissions;
-  //     unsigned char flags;
-  //     unsigned char link_count;
-  //     unsigned short block_ptr[INODE_PTR_COUNT];
-
-  //     unsigned int ref_count;  // in-core only
-  //     unsigned int inode_num;
-  // };
-  // (Note that there are two fields at the end marked "in-core only" that aren't represented in the on-disk version of the inode—don't write them to disk!)
-
-  // "CoreLinks to an external site." is an archaic term for "memory" or "RAM".
-
+struct inode *find_incore(unsigned int inode_num) {
+  
+}
   // When processes open files, the OS reads the inode off disk and stores it in an "in-core" inode. These will be our structs, above.
 
   // The OS has an area of memory set aside for in-core inodes. We're going to make a big array of them and write a couple function to search it.

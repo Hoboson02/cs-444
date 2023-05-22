@@ -6,7 +6,7 @@
 #define INODE_FIRST_BLOCK 3
 #define INODES_PER_BLOCK (BLOCK_SIZE / INODE_SIZE)
 #define FREE_INODE_BLOCK_NUM 1
-
+#define MAX_SYS_OPEN_FILES 64
 #define INODE_PTR_COUNT 16
 
 struct inode {
