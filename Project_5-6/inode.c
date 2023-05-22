@@ -103,9 +103,17 @@ void write_inode(struct inode *in) {
   int block_num = get_block_num(in->inode_num); // You'll have to map that inode number to a block
   int block_offset_bytes = get_block_offset_bytes(in->inode_num); // and offset, as per above.
   unsigned char *free_block = calloc(sizeof(unsigned char), BLOCK_SIZE);
-  // This stores the inode data pointed to by in on disk. The inode_num field in the struct holds the number of the inode to be written.
-  // You'll have to map that inode number to a block and offset, as per above.
-  // Then you'll read the data from disk into a block, and pack the new inode data with the functions from pack.c. And lastly you'll write the updated block back out to disk.
+  bread(block_num, free_block); // Then you'll read the data from disk into a block
+
+  write_u32(free_block + block_offset_bytes, in->size);
+  write_u16(free_block + block_offset_bytes + 4, in->owner_id);
+  write_u8(free_block + block_offset_bytes + 6, in->permissions);
+  write_u8(free_block + block_offset_bytes + 7, in->flags);
+  write_u8(free_block + block_offset_bytes + 8, in->link_count);
+  for (int i = 0; i < INODE_PTR_COUNT; i++) {
+    write_u16(free_block + block_offset_bytes + 9 + (i*2), in->block_ptr[i]);
+  }
+  bwrite(block_num, free_block); // And lastly you'll write the updated block back out to disk.
 }  
 
 // ----------Higher-Level Functions: iget()-------------------------------------------------------------------------------------------
