@@ -53,40 +53,18 @@ int ialloc(void) {
 
 
 // ----------In-Core inodes-------------------------------------------------------------------------------------------
+// Now we need to write two functions:
 struct inode *find_incore_free(void) {
-
+  for (int i = 0; i <MAX_SYS_OPEN_FILES; i++) {
+    if (incore[i].flags == 0) {   // If the ref_count field in the struct inode is 0, it's not being used.
+      return &incore[i]; // This finds the first free in-core inode in the incore array. It returns a pointer to that in-core inode
+    }
+  }
+  return NULL; // or NULL if there are no more free in-core inodes.
 }
 
 struct inode *find_incore(unsigned int inode_num) {
-  
-}
-  // When processes open files, the OS reads the inode off disk and stores it in an "in-core" inode. These will be our structs, above.
-
-  // The OS has an area of memory set aside for in-core inodes. We're going to make a big array of them and write a couple function to search it.
-
-  // // In inode.h
-
-  // #define MAX_SYS_OPEN_FILES 64
-  // // In inode.c at the global scope
-
-  // static struct inode incore[MAX_SYS_OPEN_FILES] = {0};
-  // static in this context makes the variable or function only accessible within this source file. This way it doesn't pollute the global namespace for other source files. It's kind of like declaring it "private" to this source file.
-
-  // Variables and functions that are static do not get added to the header file! Other files can't see those functions anyway, so there's no reason to include them.
-
-  // Now we need to write two functions:
-
-    // struct inode *find_incore_free(void): This finds the first free in-core inode in the incore array. It returns a pointer to that in-core inode or NULL if there are no more free in-core inodes.
-
-    // How do we know if an in-core inode is in use? Each one has a reference count, which is loosely how many processes are using it right now. (There are some additional abstraction layers in there, but we'll ignore them for now.)
-
-    // If the ref_count field in the struct inode is 0, it's not being used.
-
-    // So we just have to search through the incore array and find the first one that's free.
-
-    // It's OK to use an O(n) solution for this. In real life, we'd want something better, but linear search is fine for this project.
-
-    // So find_incore_free() will just search the array until it finds a struct inode with ref_count of 0, and return a pointer to that struct.
+  // So find_incore_free() will just search the array until it finds a struct inode with ref_count of 0, and return a pointer to that struct.
 
     // struct inode *find_incore(unsigned int inode_num): This finds an in-core inode record in the incore array by the inode number. It returns a pointer to that in-core inode or NULL if it can't be found.
 
@@ -95,6 +73,7 @@ struct inode *find_incore(unsigned int inode_num) {
     // Luckily, we have a field in the struct inode: inode_num. We just have to match this.
 
     // So find_incore() will search the array until it finds a struct inode with a non-zero ref_count AND the inode_num field matches the number passed to the function.
+}
 
     // They both return a struct inode *, which should point to one of the elements in the incore array.
 
