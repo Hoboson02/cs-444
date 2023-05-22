@@ -1,9 +1,11 @@
 Project_1/hellothread
 Project_2/reservations
 Project_3/pcseml
-Project_5/simfs.a
-Project_5/block.o
-Project_5/image.o
-Project_5/free.o
-Project_5/inode.o
-Project_5/mkfs.o
+Project_5-6/simfs.a
+Project_5-6/block.o
+Project_5-6/image.o
+Project_5-6/free.o
+Project_5-6/inode.o
+Project_5-6/mkfs.o
+Project_5-6/mkfs.o
+Project_5-6/pack.o
