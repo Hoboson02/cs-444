@@ -72,33 +72,19 @@ struct inode *find_incore(unsigned int inode_num) {
   return NULL; // or NULL if it can't be found.
 }
 
-    // They both return a struct inode *, which should point to one of the elements in the incore array.
-
-  // Protip: TEST, TEST, TEST! You should write a test to find a free inode, then modify it to set some values (including the inode_num) and then you should be able to search for that by number and get the same data back.
-
-  // You want to be confident that these are working before you rely on them!
-
-
 // ----------Reading and Writing inodes from Memory and Disk-------------------------------------------------------------------------------------------
-
-  // Next, we need to be able to read and write inodes to and from disk.
-
   // We're going to write two functions:
-
-    // void read_inode(struct inode *in, int inode_num): This takes a pointer to an empty struct inode that you're going to read the data into. The inode_num is the number of the inode you wish to read from disk.
-
+void read_inode(struct inode *in, int inode_num) {
+    // This takes a pointer to an empty struct inode that you're going to read the data into. The inode_num is the number of the inode you wish to read from disk.
     // You'll have to map that inode number to a block and offset, as per above.
-
     // Then you'll read the data from disk into a block, and unpack it with the functions from pack.c. And you'll store the results in the struct inode * that was passed in.
+}
 
-    // void write_inode(struct inode *in): This stores the inode data pointed to by in on disk. The inode_num field in the struct holds the number of the inode to be written.
-
-    // You'll have to map that inode number to a block and offset, as per above.
-
-    // Then you'll read the data from disk into a block, and pack the new inode data with the functions from pack.c. And lastly you'll write the updated block back out to disk.
-
-  // TEST! TEST! TEST!
-
+void write_inode(struct inode *in) {
+  // This stores the inode data pointed to by in on disk. The inode_num field in the struct holds the number of the inode to be written.
+  // You'll have to map that inode number to a block and offset, as per above.
+  // Then you'll read the data from disk into a block, and pack the new inode data with the functions from pack.c. And lastly you'll write the updated block back out to disk.
+}  
 
 // ----------Higher-Level Functions: iget()-------------------------------------------------------------------------------------------
 
