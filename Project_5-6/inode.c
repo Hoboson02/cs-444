@@ -64,15 +64,12 @@ struct inode *find_incore_free(void) {
 }
 
 struct inode *find_incore(unsigned int inode_num) {
-  // So find_incore_free() will just search the array until it finds a struct inode with ref_count of 0, and return a pointer to that struct.
-
-    // struct inode *find_incore(unsigned int inode_num): This finds an in-core inode record in the incore array by the inode number. It returns a pointer to that in-core inode or NULL if it can't be found.
-
-    // But for finding by inode number, how do we know if a particular struct inode has that number? It's not the same as the index into the incore array!
-
-    // Luckily, we have a field in the struct inode: inode_num. We just have to match this.
-
-    // So find_incore() will search the array until it finds a struct inode with a non-zero ref_count AND the inode_num field matches the number passed to the function.
+  for (int i = 0; i <MAX_SYS_OPEN_FILES; i++) {
+    if(incore[i].ref_count != 0 && incore[i].inode_num == inode_num) { // So find_incore() will search the array until it finds a struct inode with a non-zero ref_count AND the inode_num field matches the number passed to the function. Luckily, we have a field in the struct inode: inode_num. We just have to match this.
+      return &incore[i]; //It returns a pointer to that in-core inode 
+    }
+  }
+  return NULL; // or NULL if it can't be found.
 }
 
     // They both return a struct inode *, which should point to one of the elements in the incore array.
