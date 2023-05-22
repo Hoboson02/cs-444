@@ -124,29 +124,23 @@ void write_inode(struct inode *in) {
   // But wait—didn't we just write that with read_inode()? Not quite. That function doesn't actually know anything about in-core inodes; it just writes to whatever pointer you pass in.
 
   // iget() will glue this stuff together.
-struct inode *iget(int inode_num) {
+struct inode *iget(int inode_num) { // Return a pointer to an in-core inode for the given inode number, or NULL on failure.
+  struct inode *incore_node = find_incore(inode_num); // Search for the inode number in-core (find_incore())
+  if (incore_node != NULL) { // If found:
+    incore_node->ref_count++;  // Increment the ref_count
+    return incore_node;  // Return the pointer
+  }
+
+  struct inode *incore_free_node = find_incore_free();  // Find a free in-core inode (find_incore_free())
+  if (incore_free_node == NULL) {// If none found:
+    return NULL; // Return NULL
+  }
   
+  read_inode(incore_free_node, inode_num);  // Read the data from disk into it (read_inode())
+  incore_free_node->ref_count = 1;  // Set the inode's ref_count to 1
+  incore_free_node->inode_num = inode_num;  // Set the inode's inode_num to the inode number that was passed in
+  return incore_free_node;  // Return the pointer to the inode
 }
-  // Here's the function signature (which you should add to inode.h):
-    // struct inode *iget(int inode_num): Return a pointer to an in-core inode for the given inode number, or NULL on failure.
-  
-  // The algorithm is this:
-    // Search for the inode number in-core (find_incore())
-    // If found:
-    // Increment the ref_count
-    // Return the pointer
-    // Find a free in-core inode (find_incore_free())
-    // If none found:
-    // Return NULL
-    // Read the data from disk into it (read_inode())
-    // Set the inode's ref_count to 1
-    // Set the inode's inode_num to the inode number that was passed in
-    // Return the pointer to the inode
-
-  // So what it does is gives you the inode one way or another. If the inode was already in-core, it just increments the reference count and returns a pointer.
-
-  // If the inode wasn't already in-core, it allocates space for it, loads it up, sets the ref_count to 1, and returns the pointer.
-
 
 // ----------Higher-Level Functions: iput()-------------------------------------------------------------------------------------------
 
