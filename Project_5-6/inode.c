@@ -147,13 +147,11 @@ struct inode *iget(int inode_num) { // Return a pointer to an in-core inode for 
   // This is the opposite of iget(). It effectively frees the inode if no one is using it.
 
 void iput(struct inode *in) { // decrement the reference count on the inode. If it falls to 0, write the inode to disk.
-  // Algorithm:
-
-    // If ref_count on in is already 0:
-      // Return
-    // Decrement ref_count
-    // If ref_count is 0:
-      // Save the inode to disk (write_inode())
+  if (in->ref_count == 0) {  // If ref_count on in is already 0:
+    return; // Return
+  }
+  in->ref_count--;  // Decrement ref_count
+  if (in->ref_count == 0) { // If ref_count is 0:
+    write_inode(in);  // Save the inode to disk (write_inode())
+  }
 }
-
-  // TEST! TEST! TEST!
