@@ -85,7 +85,7 @@ struct inode *find_incore(unsigned int inode_num) {
 void read_inode(struct inode *in, int inode_num) {
   int block_num = get_block_num(inode_num); // You'll have to map that inode number to a block
   int block_offset_bytes = get_block_offset_bytes(inode_num); // and offset, as per above.
-  unsigned char *free_block = calloc(BLOCK_SIZE, sizeof(unsigned char));
+  unsigned char *free_block = calloc(sizeof(unsigned char), BLOCK_SIZE);
 
   bread(block_num, free_block); // Then you'll read the data from disk into a block
 
@@ -100,6 +100,9 @@ void read_inode(struct inode *in, int inode_num) {
 }
 
 void write_inode(struct inode *in) {
+  int block_num = get_block_num(in->inode_num); // You'll have to map that inode number to a block
+  int block_offset_bytes = get_block_offset_bytes(in->inode_num); // and offset, as per above.
+  unsigned char *free_block = calloc(sizeof(unsigned char), BLOCK_SIZE);
   // This stores the inode data pointed to by in on disk. The inode_num field in the struct holds the number of the inode to be written.
   // You'll have to map that inode number to a block and offset, as per above.
   // Then you'll read the data from disk into a block, and pack the new inode data with the functions from pack.c. And lastly you'll write the updated block back out to disk.
