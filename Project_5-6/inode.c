@@ -1,6 +1,13 @@
 #include "inode.h"
 #include "block.h"
 #include "free.h"
+#include <stdlib.h>
+
+int block_offset = inode_num % INODES_PER_BLOCK;
+
+int block_offset_bytes = block_offset * INODE_SIZE;
+
+int flags = read_u8(block + block_offset_bytes + 7);
 
 
 int ialloc(void) {
@@ -21,16 +28,9 @@ int ialloc(void) {
 
   // So if I give you an index into that array (i.e. an inode number), you'll have to determine two things: the block number that holds that inode, and the offset within the block where it begins.
 
-  // We know there are 64 inodes per block, so we can find the block number with:
-
-  // #define BLOCK_SIZE 4096
-  // #define INODE_SIZE 64
-  // #define INODE_FIRST_BLOCK 3
-
-  // #define INODES_PER_BLOCK (BLOCK_SIZE / INODE_SIZE)
 
   // int block_num = inode_num / INODES_PER_BLOCK + INODE_FIRST_BLOCK;
-  // And all we need is the remainder to get the exact inode number within that block:
+  // And all we need is the remainder to get the exactimage.png inode number within that block:
 
   // int block_offset = inode_num % INODES_PER_BLOCK;
   // That gives us the offset (in inodes!) of where we can find inode_num in the block.
