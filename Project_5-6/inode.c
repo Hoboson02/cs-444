@@ -83,9 +83,20 @@ struct inode *find_incore(unsigned int inode_num) {
 // ----------Reading and Writing inodes from Memory and Disk-------------------------------------------------------------------------------------------
   // We're going to write two functions:
 void read_inode(struct inode *in, int inode_num) {
-    // This takes a pointer to an empty struct inode that you're going to read the data into. The inode_num is the number of the inode you wish to read from disk.
-    // You'll have to map that inode number to a block and offset, as per above.
-    // Then you'll read the data from disk into a block, and unpack it with the functions from pack.c. And you'll store the results in the struct inode * that was passed in.
+  int block_num = get_block_num(inode_num); // You'll have to map that inode number to a block
+  int block_offset_bytes = get_block_offset_bytes(inode_num); // and offset, as per above.
+  unsigned char *free_block = calloc(BLOCK_SIZE, sizeof(unsigned char));
+
+  bread(block_num, free_block); // Then you'll read the data from disk into a block
+
+  in->size = read_u32(free_block, block_offset_bytes);
+  in->owner_id = read_u16(free_block, block_offset_bytes);
+  in->permissions = read_u8(free_block, block_offset_bytes);
+  in->flags = read_u8(free_block, block_offset_bytes);
+  in->link_count = read_u8(free_block, block_offset_bytes);
+  for (int i = 0; i < INODE_PTR_COUNT; i++) {
+    in->block_ptr[i] = read_u16(free_block + block_offset_bytes + 9 + (i*2));
+  }
 }
 
 void write_inode(struct inode *in) {
