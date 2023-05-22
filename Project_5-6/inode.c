@@ -3,6 +3,8 @@
 #include "free.h"
 #include <stdlib.h>
 
+int block_num = inode_num / INODES_PER_BLOCK + INODE_FIRST_BLOCK;
+
 int block_offset = inode_num % INODES_PER_BLOCK;
 
 int block_offset_bytes = block_offset * INODE_SIZE;
