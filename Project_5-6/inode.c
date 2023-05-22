@@ -21,18 +21,6 @@ int get_flags(block, block_offset_bytes) {
 
 static struct inode incore[MAX_SYS_OPEN_FILES] = {0};
 
-int ialloc(void) {
-  unsigned char inode_map[BLOCK_SIZE];
-  bread(FREE_INODE_BLOCK_NUM, inode_map);
-  int low_free_bit = find_free(inode_map);
-  if(low_free_bit != -1) {
-    set_free(inode_map, low_free_bit, 1);
-    bwrite(FREE_INODE_BLOCK_NUM ,inode_map);
-  }
-  return low_free_bit;
-}
-
-
 // ----------Finding an inode and Reading Data-------------------------------------------------------------------------------------------
 
   // Think of the inode blocks (there are 4 of them) on disk like a contiguous array of inodes.
@@ -154,4 +142,40 @@ void iput(struct inode *in) { // decrement the reference count on the inode. If 
   if (in->ref_count == 0) { // If ref_count is 0:
     write_inode(in);  // Save the inode to disk (write_inode())
   }
+}
+// ----------Higher-Level Functions: iput()-------------------------------------------------------------------------------------------
+// So ialloc() will just be the same as iget(), with the added functionality that ialloc() will allocate a new inode(), whereas iget() only returns existing inodes.
+
+// Both of the functions will return a pointer to an in-core inode.
+
+struct inode *ialloc(void) {
+  unsigned char inode_map[BLOCK_SIZE];
+  unsigned char *free_block = calloc(sizeof(unsigned char), BLOCK_SIZE);
+  bread(FREE_INODE_BLOCK_NUM, inode_map);
+  int free_bit = find_free(free_block); // Save the inode number of the newly-allocated inode (returned by find_free());
+  if(free_bit == -1) { // If none are free: Return NULL
+    return NULL;
+  }
+
+  struct inode* incore = iget(free_bit);  // Get an in-core version of the inode (iget())
+  if (incore == NULL) {// If not found:
+    return NULL;  // Return NULL
+  }
+
+  // Initialize the inode:
+  // Set the size, owner ID, permissions, and flags to 0.
+  incore->size = 0;
+  incore->owner_id = 0;
+  incore->permissions = 0;
+  incore->flags = 0;
+
+  for (int i = 0; i < INODE_PTR_COUNT; i++) { // Set all the block pointers to 0.
+    incore->block_ptr[i] = 0; 
+  }
+
+  incore->inode_num = free_bit; // Set the inode_num field to the inode number (from find_free())
+
+  write_inode(incore);  // Save the inode to disk (write_inode())
+
+  return incore; // Return the pointer to the in-core inode.
 }
