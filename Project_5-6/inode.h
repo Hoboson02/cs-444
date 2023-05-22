@@ -20,7 +20,10 @@ struct inode {
   unsigned int ref_count;  // in-core only
   unsigned int inode_num;
 };
-
+struct inode *find_incore_free(void);
+struct inode *find_incore(unsigned int inode_num);
+void read_inode(struct inode *in, int inode_num);
+void write_inode(struct inode *in);
 int ialloc(void);
 
 #endif
