@@ -103,6 +103,7 @@ void write_inode(struct inode *in) {
   int block_num = get_block_num(in->inode_num); // You'll have to map that inode number to a block
   int block_offset_bytes = get_block_offset_bytes(in->inode_num); // and offset, as per above.
   unsigned char *free_block = calloc(sizeof(unsigned char), BLOCK_SIZE);
+
   bread(block_num, free_block); // Then you'll read the data from disk into a block
 
   write_u32(free_block + block_offset_bytes, in->size);
@@ -123,7 +124,9 @@ void write_inode(struct inode *in) {
   // But wait—didn't we just write that with read_inode()? Not quite. That function doesn't actually know anything about in-core inodes; it just writes to whatever pointer you pass in.
 
   // iget() will glue this stuff together.
-
+struct inode *iget(int inode_num) {
+  
+}
   // Here's the function signature (which you should add to inode.h):
     // struct inode *iget(int inode_num): Return a pointer to an in-core inode for the given inode number, or NULL on failure.
   
