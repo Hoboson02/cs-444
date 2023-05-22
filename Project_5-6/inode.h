@@ -7,6 +7,16 @@
 #define INODES_PER_BLOCK (BLOCK_SIZE / INODE_SIZE)
 #define FREE_INODE_BLOCK_NUM 1
 
+struct inode {
+  unsigned int file_size;
+  unsigned short owner_id;
+  unsigned char permissions;
+  unsigned char flags;
+  unsigned char link_count;
+  unsigned short block_ptr[16];
+  unsigned char unused[23];
+};
+
 int ialloc(void);
 
 #endif
