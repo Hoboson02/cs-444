@@ -3,9 +3,9 @@
 ## Introduction
 Remember:
 
-Understand this spec completely before writing a line of code. DM questions early and often.
+- Understand this spec completely before writing a line of code. DM questions early and often.
 
-Don't hardcode any magic numbers!
+- Don't hardcode any magic numbers!
 
 So far we've just been building the lower-level building blocks of the file system. Now, at last, it's time to construct something tangible.
 
@@ -13,11 +13,11 @@ We're going to add the root directory to the file system! And we're going to cre
 
 The big picture:
 
-Create the root directory--this will be the job of mkfs().
-Write a function to "open" the directory so you can read the entries.
-Write a function that will read directory entries.
-Write a function that will close the directory.
-Use those functions to write a function called ls() that will show the entries in the root directory.
+1. Create the root directory--this will be the job of mkfs().
+2. Write a function to "open" the directory so you can read the entries.
+3. Write a function that will read directory entries.
+4. Write a function that will close the directory.
+5. Use those functions to write a function called ls() that will show the entries in the root directory.
 In a later project, we'll implement an algorithm to find the inode of an item at the end of a path, like the inode for frobozz on the path /foo/bar/baz/frobozz.
 
 ## Backstory
@@ -40,7 +40,7 @@ Since each data block is 4096 bytes, there are 4096/32 or 128 directory entries 
 ### Directory Metadata
 The directory inode has a couple interesting features.
 
-The flags field needs to be set to represent that this is a directory as opposed to a regular user file.
+- The flags field needs to be set to represent that this is a directory as opposed to a regular user file.
 
 We set it to the value 2 to indicate this:
 
@@ -49,7 +49,7 @@ flags	Description
 0	Indicates unknown type
 1	File is a regular file
 2	File is a directory
-The size field is the number of bytes taken up by all used directory entries in this directory.
+- The size field is the number of bytes taken up by all used directory entries in this directory.
 
 For example, if the directory contained 377 items, the total size of the directory would be 377×32 (32 bytes per entry) which is 12064.
 
@@ -77,36 +77,36 @@ mkfs() will be expanded by this project. In addition to its previous abilities, 
 
 In order to create a new file of any kind, including a directory, we need to:
 
-Get an inode for that file (ialloc()).
-Get a data block to hold the hardcoded entries (alloc()).
-Initialize the inode to have the correct metadata.
-Write the directory entries to an in-memory block.
-Write the block out to disk.
+- Get an inode for that file (ialloc()).
+- Get a data block to hold the hardcoded entries (alloc()).
+- Initialize the inode to have the correct metadata.
+- Write the directory entries to an in-memory block.
+- Write the block out to disk.
 Broken down:
 
-Call ialloc() to get a new inode.
+1. Call ialloc() to get a new inode.
 
 We'll need the inode_num later to add it to the directory!
 
-Call alloc() to get a new data block.
+2. Call alloc() to get a new data block.
 
 This will hold the directory entries.
 
 Be sure to note the returned block number because we're going to need to write to it in just a minute!
 
-Initialize the inode returned from ialloc(), above.
+3. Initialize the inode returned from ialloc(), above.
 
-flags needs to be set to 2.
+  - flags needs to be set to 2.
 
-size needs to be set to the byte size of the directory. Since we have two entries (. and ..) and each is 32 bytes, the size must be 64 bytes.
+  - size needs to be set to the byte size of the directory. Since we have two entries (. and ..) and each is 32 bytes, the size must be 64 bytes.
 
-block_ptr[0] needs to point to the data block we just got from alloc(), above.
+  - block_ptr[0] needs to point to the data block we just got from alloc(), above.
 
-Make an unsigned char block[BLOCK_SIZE] array that you can populate with the new directory data.
+4. Make an unsigned char block[BLOCK_SIZE] array that you can populate with the new directory data.
 
 We're going to pack the . and .. directory entries in here.
 
-Add the directory entries. You're going to need to math it out.
+5. Add the directory entries. You're going to need to math it out.
 
 You know the first two-byte value is the inode number, so you can pack that in with write_16(). Remember that for the root inode, both the . and .. inode numbers are the same as the root inode itself (i.e. the inode_num you got back from ialloc()).
 
@@ -116,9 +116,9 @@ You have to do this process for both . and .. entries.
 
 Compute the offsets into your in-memory block and copy the data there.
 
-Write the directory data block back out to disk with bwrite().
+6. Write the directory data block back out to disk with bwrite().
 
-Call iput() to write the new directory inode out to disk and free up the in-core inode.
+7. Call iput() to write the new directory inode out to disk and free up the in-core inode.
 
 At this point, we should have a root directory. But other than doing a raw iget() and bread() to get the block, we don't have a nice way of interfacing with it.
 
@@ -155,15 +155,15 @@ It has a pointer to the directory (root's) inode. It also has an offset, which i
 
 So the process is:
 
-Use iget() to get the inode for this file.
+1. Use iget() to get the inode for this file.
+ 
+2. If it fails, directory_open() should return NULL.
 
-If it fails, directory_open() should return NULL.
+3. malloc() space for a new struct directory.
 
-malloc() space for a new struct directory.
+4. In the struct, set the inode pointer to point to the inode returned by iget().
 
-In the struct, set the inode pointer to point to the inode returned by iget().
-
-Initialize offset to 0.
+5. Initialize offset to 0.
 
 Return the pointer to the struct.
 
@@ -195,16 +195,16 @@ Where shall we store it? Well, if you remember, the struct directory we got from
 
 So the steps will be:
 
-Check the offset against the size of the directory. If the offset is greater-than or equal-to the directory size (in its inode), we must be off the end of the directory. If so, return -1 to indicate that.
+1. Check the offset against the size of the directory. If the offset is greater-than or equal-to the directory size (in its inode), we must be off the end of the directory. If so, return -1 to indicate that.
 
-Compute the block in the directory we need to read. The directory file itself might span multiple data blocks if there are enough entries in it. Remember that a block only holds 128 entries. (When we just create it, it will only be one block, but we might as well do this math now so it will work later.)
+2. Compute the block in the directory we need to read. The directory file itself might span multiple data blocks if there are enough entries in it. Remember that a block only holds 128 entries. (When we just create it, it will only be one block, but we might as well do this math now so it will work later.)
 
 If each block is 4096 bytes, and we're at offset 4800, we must be past the end of block 0 and we're somewhere in block 1. Good old divide and modulo to the rescue!
 
 data_block_index = offset / 4096;
 Beware! this isn't the absolute block number on disk. Don't just feed this number into bread()! See the next step, below!
 
-We need to read the appropriate data block in so we can extract the directory entry from it.
+3. We need to read the appropriate data block in so we can extract the directory entry from it.
 
 But what we have, the data_block_index, is giving us the index into the block_ptr array in the directory's inode.
 
@@ -219,7 +219,7 @@ data_block_num = dir->inode->block_ptr[data_block_index];
 bread(data_block_num, block);
 And there we've read the block containing the directory entry we want into memory.
 
-Compute the offset of the directory entry in the block we just read.
+4. Compute the offset of the directory entry in the block we just read.
 
 We know the absolute offset of where we are in the file (passed in the struct directory.
 
@@ -228,7 +228,7 @@ We know the size of the block, 4096 bytes.
 So we can compute the offset within the block:
 
 offset_in_block = offset % 4096;
-Extract the directory entry from the raw data in the block into the struct directory_entry * we passed in.
+5. Extract the directory entry from the raw data in the block into the struct directory_entry * we passed in.
 
 Now we have the data in our block array, and we've computed where it starts with offset_in_block. We just have to deserialize it.
 
@@ -244,9 +244,9 @@ The function for closing is:
 void directory_close(struct directory *d)
 It only has to do two things:
 
-iput() the directory's in-core inode to free it up.
+1. iput() the directory's in-core inode to free it up.
 
-free() the struct directory.
+2. free() the struct directory.
 
 ## A Simple ls Function
 We might as well put it all to use. Let's write ls(). (You can make a new ls.c file for this.)
@@ -255,10 +255,10 @@ The plan here is pretty straightforward for a change.
 
 We're going to:
 
-Open the directory.
-Read the entries in a loop until the reader returns -1.
-Print out each one in the loop.
-Close the directory once the loop is complete.
+1. Open the directory.
+2. Read the entries in a loop until the reader returns -1.
+3. Print out each one in the loop.
+4. Close the directory once the loop is complete.
 Code is something like this (untested):
 
 void ls(void)
