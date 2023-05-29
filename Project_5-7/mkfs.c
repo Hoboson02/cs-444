@@ -13,51 +13,52 @@ void mkfs(void) {
   for(int i = 0; i < 7; i++) {
     alloc();
   }
-}
+
 
 // ## Create the Root Directory
 // Broken down:
 
-// 1. Call ialloc() to get a new inode.
+  int inode_num = ialloc(); // 1. Call ialloc() to get a new inode.
 
 // We'll need the inode_num later to add it to the directory!
 
-// 2. Call alloc() to get a new data block.
+  int block_num = alloc(); // 2. Call alloc() to get a new data block.
 
 // This will hold the directory entries.
 
 // Be sure to note the returned block number because we're going to need to write to it in just a minute!
 
-// 3. Initialize the inode returned from ialloc(), above.
+  struct inode *root = iget(inode_num); // 3. Initialize the inode returned from ialloc(), above.
+  
+  root->flags = DIRECTORY_FLAG; //   - flags needs to be set to 2.
 
-//   - flags needs to be set to 2.
+  root->size = DIRECTORY_SIZE; //   - size needs to be set to the byte size of the directory. Since we have two entries (. and ..) and each is 32 bytes, the size must be 64 bytes.
 
-//   - size needs to be set to the byte size of the directory. Since we have two entries (. and ..) and each is 32 bytes, the size must be 64 bytes.
+  root->block_ptr[0] = block_num;//   - block_ptr[0] needs to point to the data block we just got from alloc(), above.
 
-//   - block_ptr[0] needs to point to the data block we just got from alloc(), above.
-
-// 4. Make an unsigned char block[BLOCK_SIZE] array that you can populate with the new directory data.
+  unsigned char block[BLOCK_SIZE];// 4. Make an unsigned char block[BLOCK_SIZE] array that you can populate with the new directory data.
 
 // We're going to pack the . and .. directory entries in here.
 
-// 5. Add the directory entries. You're going to need to math it out.
+  write_u16(block, inode_num); // 5. Add the directory entries. You're going to need to math it out.
 
 // You know the first two-byte value is the inode number, so you can pack that in with write_16(). Remember that for the root inode, both the . and .. inode numbers are the same as the root inode itself (i.e. the inode_num you got back from ialloc()).
 
-// The next up-to-16 bytes are the file name. You can copy that in with strcpy(). (You might have to cast some arguments to char*.)
+  strcpy((char*)block + FILE_OFFSET, "."); // The next up-to-16 bytes are the file name. You can copy that in with strcpy(). (You might have to cast some arguments to char*.)
 
 // You have to do this process for both . and .. entries.
-
+  write_u16(block + FILE_OFFSET + DIRECTORY_ENTRY_SIZE, inode_num);
+  strcpy((char*)block + FILE_OFFSET, ".");
 // Compute the offsets into your in-memory block and copy the data there.
 
-// 6. Write the directory data block back out to disk with bwrite().
+  bwrite(block_num, block); // 6. Write the directory data block back out to disk with bwrite().
 
-// 7. Call iput() to write the new directory inode out to disk and free up the in-core inode.
+  iput(root); // 7. Call iput() to write the new directory inode out to disk and free up the in-core inode.
 
 // At this point, we should have a root directory. But other than doing a raw iget() and bread() to get the block, we don't have a nice way of interfacing with it.
 
 // Also, the root directory inode number should be 0, since it's the first one we've allocated.
-
+}
 
 // ## Directory Open/Read/Close Ops
 // ### Opening a Directory
