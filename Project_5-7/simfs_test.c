@@ -7,6 +7,7 @@
 #include "free.h"
 #include "inode.h"
 #include "mkfs.h"
+#include "ls.h"
 #include "ctest.h"
 
 #ifdef CTEST_ENABLE
@@ -71,7 +72,7 @@ int main(void) {
   test_free();
   test_inode();
   test_mkfs();
-
+  ls();
   CTEST_RESULTS();
   CTSET_EXIT();
   #endif
