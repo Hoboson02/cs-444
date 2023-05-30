@@ -1,6 +1,6 @@
 .PHONY: test
 
-simfs.a: image.o block.o free.o inode.o mkfs.o pack.o
+simfs.a: image.o block.o free.o inode.o mkfs.o pack.o ls.o
 	ar rcs $@ $^
 
 image.o: image.c image.h
@@ -19,6 +19,9 @@ mkfs.o: mkfs.c mkfs.h
 	gcc -Wall -Wextra -c $<
 
 pack.o: pack.c pack.h
+	gcc -Wall -Wextra -c $<
+
+ls.o: ls.c ls.h
 	gcc -Wall -Wextra -c $<
 
 simfs_test: simfs_test.c simfs.a
