@@ -9,4 +9,11 @@
 
 void mkfs(void);
 
+struct directory {
+  struct inode *inode;
+  unsigned int offset;
+};
+
+struct directory *directory_open(int inode_num);
+
 #endif

@@ -63,19 +63,20 @@ void mkfs(void) {
 // ## Directory Open/Read/Close Ops
 // ### Opening a Directory
 // So the process is:
+struct directory *directory_open(int inode_num) {
+  struct inode* open_directory = iget(inode_num); // 1. Use iget() to get the inode for this file.
+  
+  if (open_directory == NULL) {// 2. If it fails, directory_open() should return NULL.
+    return NULL;
+  }
+  struct directory *directory_struct = malloc(sizeof(struct directory)); // 3. malloc() space for a new struct directory.
 
-// 1. Use iget() to get the inode for this file.
- 
-// 2. If it fails, directory_open() should return NULL.
+  directory_struct->inode = open_directory; // 4. In the struct, set the inode pointer to point to the inode returned by iget().
 
-// 3. malloc() space for a new struct directory.
+  directory_struct->offset = 0; // 5. Initialize offset to 0.
 
-// 4. In the struct, set the inode pointer to point to the inode returned by iget().
-
-// 5. Initialize offset to 0.
-
-// Return the pointer to the struct.
-
+  return directory_struct; // Return the pointer to the struct.
+}
 // ## Reading a Directory
 
 // So the steps will be:
