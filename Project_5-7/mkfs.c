@@ -125,9 +125,10 @@ int directory_get(struct directory *dir, struct directory_entry *ent) {
 // ### Closing a Directory
 // The function for closing is:
 
-// void directory_close(struct directory *d)
-// It only has to do two things:
+void directory_close(struct directory *d) {// void directory_close(struct directory *d)
+  // It only has to do two things:
 
-// 1. iput() the directory's in-core inode to free it up.
+  iput(d->inode); // 1. iput() the directory's in-core inode to free it up.
 
-// 2. free() the struct directory.
+  free(d); // 2. free() the struct directory.
+}
