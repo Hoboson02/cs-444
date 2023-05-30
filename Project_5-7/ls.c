@@ -1,3 +1,7 @@
+#include "ls.h"
+#include "mkfs.h"
+#include <stdio.h>
+
 void ls(void)
 {
   struct directory *dir;
