@@ -3,7 +3,10 @@
 #include "free.h"
 #include "image.h"
 #include "inode.h"
+#include "pack.h"
 #include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
 
 void mkfs(void) {
   for(int i = 0; 1 < NUM_OF_BLOCKS; i++) {
@@ -18,7 +21,7 @@ void mkfs(void) {
 // ## Create the Root Directory
 // Broken down:
 
-  int inode_num = ialloc(); // 1. Call ialloc() to get a new inode.
+  struct inode *inode = ialloc(); // 1. Call ialloc() to get a new inode.
 
 // We'll need the inode_num later to add it to the directory!
 
@@ -28,7 +31,7 @@ void mkfs(void) {
 
 // Be sure to note the returned block number because we're going to need to write to it in just a minute!
 
-  struct inode *root = iget(inode_num); // 3. Initialize the inode returned from ialloc(), above.
+  struct inode *root = iget(inode->inode_num); // 3. Initialize the inode returned from ialloc(), above.
   
   root->flags = DIRECTORY_FLAG; //   - flags needs to be set to 2.
 
@@ -40,14 +43,14 @@ void mkfs(void) {
 
 // We're going to pack the . and .. directory entries in here.
 
-  write_u16(block, inode_num); // 5. Add the directory entries. You're going to need to math it out.
+  write_u16(block, inode->inode_num); // 5. Add the directory entries. You're going to need to math it out.
 
 // You know the first two-byte value is the inode number, so you can pack that in with write_16(). Remember that for the root inode, both the . and .. inode numbers are the same as the root inode itself (i.e. the inode_num you got back from ialloc()).
 
   strcpy((char*)block + FILE_OFFSET, "."); // The next up-to-16 bytes are the file name. You can copy that in with strcpy(). (You might have to cast some arguments to char*.)
 
 // You have to do this process for both . and .. entries.
-  write_u16(block + FILE_OFFSET + DIRECTORY_ENTRY_SIZE, inode_num);
+  write_u16(block + FILE_OFFSET + DIRECTORY_ENTRY_SIZE, inode->inode_num);
   strcpy((char*)block + FILE_OFFSET, ".");
 // Compute the offsets into your in-memory block and copy the data there.
 
