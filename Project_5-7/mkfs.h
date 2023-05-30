@@ -14,6 +14,11 @@ struct directory {
   unsigned int offset;
 };
 
+struct directory_entry {
+  unsigned int inode_num;
+  char name[16];
+};
+
 struct directory *directory_open(int inode_num);
 
 #endif
