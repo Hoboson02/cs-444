@@ -176,10 +176,19 @@ struct inode *ialloc(void) {
   return incore; // Return the pointer to the in-core inode.
 }
 
-struct inode *namei(char *path) {
-  // If the path is /, it returns the root directory's in-core inode.
+struct inode *namei(char *path) { // Find the inode for the parent directory that will hold the new entry (namei()).
+  if (*path == '/') {// If the path is /, it returns the root directory's in-core inode.
+    return iget(ROOT_INODE_NUM);
+  }
+  else {
+    return NULL;
+  }
   // If the path is /foo, it returns foo's in-core inode.
   // If the path is /foo/bar, it returns bar's in-core inode.
   // If the path is invalid (i.e. a component isn't found), it returns NULL.
-  return iget(ROOT_INODE_NUM);
+  
+}
+
+int directory_make(char *path) {
+
 }
