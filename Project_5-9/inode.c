@@ -3,6 +3,7 @@
 #include "free.h"
 #include "pack.h"
 #include "dirbasename.h"
+#include "mkfs.h"
 #include <stdlib.h>
 
 int get_block_num(int inode_num) {
@@ -201,4 +202,15 @@ int directory_make(char *path) {
   }
   struct inode *newi = ialloc();  // Create a new inode for the new directory (ialloc()).
   struct inode *new_data_block = alloc();  // Create a new data block for the new directory entries (alloc()).
+  char new_block[BLOCK_SIZE];  // Create a new block-sized array for the new directory data block and 
+  write_u16(new_block, newi->inode_num);  // initialize it . and .. files.
+  strcpy((char*)new_block + FILE_OFFSET, ".");
+  write_u16(new_block + DIRECTORY_ENTRY_SIZE, parenti->inode_num);
+  strcpy((char*)new_block + FILE_OFFSET + DIRECTORY_ENTRY_SIZE, "..");
+
+  newi->flags = DIRECTORY_FLAG; // Initialize the new directory in-core inode with a proper size and other fields, similar to how we did with the hard-coded root directory in the previous project.
+  newi->size = DIRECTORY_SIZE;
+  newi->block_ptr[0] = new_data_block;
+
+  bwrite(new_data_block, new_block);  // Write the new directory data block to disk (bwrite()).
 }
