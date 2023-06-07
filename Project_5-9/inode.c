@@ -2,6 +2,7 @@
 #include "block.h"
 #include "free.h"
 #include "pack.h"
+#include "dirbasename.h"
 #include <stdlib.h>
 
 int get_block_num(int inode_num) {
@@ -190,5 +191,8 @@ struct inode *namei(char *path) { // Find the inode for the parent directory tha
 }
 
 int directory_make(char *path) {
-
+  char *dirname = calloc(MAX_PATH_LENGTH, sizeof(char));
+  char *basename = calloc(MAX_PATH_LENGTH, sizeof(char));
+  get_dirname(path, dirname); // Find the directory path that will contain the new directory.
+  get_dirname(path, basename); // Find the new directory name from the path.
 }

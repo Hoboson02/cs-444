@@ -9,6 +9,7 @@
 #define MAX_SYS_OPEN_FILES 64
 #define INODE_PTR_COUNT 16
 #define ROOT_INODE_NUM 0
+#define MAX_PATH_LENGTH 128
 
 struct inode {
   unsigned int size;
