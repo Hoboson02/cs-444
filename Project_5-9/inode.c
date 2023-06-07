@@ -195,7 +195,7 @@ int directory_make(char *path) {
   char *dirname = calloc(MAX_PATH_LENGTH, sizeof(char));
   char *basename = calloc(MAX_PATH_LENGTH, sizeof(char));
   get_dirname(path, dirname); // Find the directory path that will contain the new directory.
-  get_dirname(path, basename); // Find the new directory name from the path.
+  get_basename(path, basename); // Find the new directory name from the path.
   struct inode *parenti = namei(dirname);  // Find the inode for the parent directory that will hold the new entry (namei()).
   if (!parenti) {
     return -1;
@@ -213,4 +213,18 @@ int directory_make(char *path) {
   newi->block_ptr[0] = new_data_block;
 
   bwrite(new_data_block, new_block);  // Write the new directory data block to disk (bwrite()).
+  int numitems = parenti->size/DIRECTORY_ENTRY_SIZE;  // From the parent directory inode, find the block that will contain the new directory entry (using the size and block_ptr fields).
+  int parent_block_num = numitems/MAX_PATH_LENGTH;
+  unsigned char parentblock[BLOCK_SIZE];
+  bread(parenti->block_ptr[parent_block_num], parentblock); // Read that block into memory unless you're creating a new one (bread()), and add the new directory entry to it.  
+
+  bwrite(parent_block_num, parentblock);  // Write that block to disk (bwrite()).
+
+  parenti->size += 32;  // Update the parent directory's size field (which should increase by 32, the size of the new directory entry.
+  
+  iput(newi); // Release the new directory's in-core inode (iput()).
+
+  iput(parenti); // Release the parent directory's in-core inode (iput()).
+
+  return 0;
 }
