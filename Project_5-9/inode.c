@@ -195,4 +195,10 @@ int directory_make(char *path) {
   char *basename = calloc(MAX_PATH_LENGTH, sizeof(char));
   get_dirname(path, dirname); // Find the directory path that will contain the new directory.
   get_dirname(path, basename); // Find the new directory name from the path.
+  struct inode *parenti = namei(dirname);  // Find the inode for the parent directory that will hold the new entry (namei()).
+  if (!parenti) {
+    return -1;
+  }
+  struct inode *newi = ialloc();  // Create a new inode for the new directory (ialloc()).
+  struct inode *new_data_block = alloc();  // Create a new data block for the new directory entries (alloc()).
 }
